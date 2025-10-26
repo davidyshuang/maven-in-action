@@ -1,0 +1,4 @@
+com/juvenxu/mvnbook/account/web/LoginServlet.class
+com/juvenxu/mvnbook/account/web/ActivateServlet.class
+com/juvenxu/mvnbook/account/web/SignUpServlet.class
+com/juvenxu/mvnbook/account/web/CaptchaImageServlet.class

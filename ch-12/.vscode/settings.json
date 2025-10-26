@@ -1,0 +1,9 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.maven.userSettings": "",
+    "spring-boot.ls.inlayhints.enable": false,
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": true,
+    "java.server.launchMode": "Standard"
+}

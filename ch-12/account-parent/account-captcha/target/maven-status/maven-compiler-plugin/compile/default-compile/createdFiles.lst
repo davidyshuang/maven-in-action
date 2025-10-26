@@ -1,0 +1,4 @@
+com/juvenxu/mvnbook/account/captcha/RandomGenerator.class
+com/juvenxu/mvnbook/account/captcha/AccountCaptchaService.class
+com/juvenxu/mvnbook/account/captcha/AccountCaptchaException.class
+com/juvenxu/mvnbook/account/captcha/AccountCaptchaServiceImpl.class

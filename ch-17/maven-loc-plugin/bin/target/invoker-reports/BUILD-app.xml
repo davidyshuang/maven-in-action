@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build-job project="app/pom.xml" name="" description="" result="failure-post-hook" time="4.566" type="normal">
+  <failureMessage>The post-build script did not succeed. Unable to make private java.io.File(java.lang.String,java.io.File) accessible: module java.base does not "opens java.io" to unnamed module @7bf94e91</failureMessage>
+</build-job>

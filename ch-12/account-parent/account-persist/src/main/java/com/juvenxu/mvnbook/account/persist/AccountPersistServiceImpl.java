@@ -1,0 +1,165 @@
+package com.juvenxu.mvnbook.account.persist;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Iterator;
+
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+
+public class AccountPersistServiceImpl
+        implements AccountPersistService {
+    private static final String ELEMENT_ROOT = "account-persist";
+    private static final String ELEMENT_ACCOUNTS = "accounts";
+    private static final String ELEMENT_ACCOUNT = "account";
+    private static final String ELEMENT_ACCOUNT_ID = "id";
+    private static final String ELEMENT_ACCOUNT_NAME = "name";
+    private static final String ELEMENT_ACCOUNT_EMAIL = "email";
+    private static final String ELEMENT_ACCOUNT_PASSWORD = "password";
+    private static final String ELEMENT_ACCOUNT_ACTIVATED = "activated";
+
+    private String file;
+
+    private SAXReader reader = new SAXReader();
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public Account createAccount(Account account)
+            throws AccountPersistException {
+        org.dom4j.Document doc = readDocument();
+
+        org.dom4j.Element accountsEle = doc.getRootElement().element(ELEMENT_ACCOUNTS);
+
+        accountsEle.add(buildAccountElement(account));
+
+        writeDocument(doc);
+
+        return account;
+    }
+
+    public void deleteAccount(String id)
+            throws AccountPersistException {
+        org.dom4j.Document doc = readDocument();
+
+        org.dom4j.Element accountsEle = doc.getRootElement().element(ELEMENT_ACCOUNTS);
+
+        for (Iterator<org.dom4j.Element> it = accountsEle.elementIterator(ELEMENT_ACCOUNT); it.hasNext();) {
+            org.dom4j.Element accountEle = it.next();
+            if (accountEle.elementText(ELEMENT_ACCOUNT_ID).equals(id)) {
+                accountsEle.remove(accountEle);
+
+                writeDocument(doc);
+
+                return;
+            }
+        }
+    }
+
+    public Account readAccount(String id)
+            throws AccountPersistException {
+        org.dom4j.Document doc = readDocument();
+
+        org.dom4j.Element accountsEle = doc.getRootElement().element(ELEMENT_ACCOUNTS);
+
+        for (Iterator<org.dom4j.Element> it = accountsEle.elementIterator(ELEMENT_ACCOUNT); it.hasNext();) {
+            org.dom4j.Element accountEle = it.next();
+            if (accountEle.elementText(ELEMENT_ACCOUNT_ID).equals(id)) {
+                return buildAccount(accountEle);
+            }
+        }
+
+        return null;
+    }
+
+    public Account updateAccount(Account account)
+            throws AccountPersistException {
+        if (readAccount(account.getId()) != null) {
+            deleteAccount(account.getId());
+
+            return createAccount(account);
+        }
+
+        return null;
+    }
+
+    private Account buildAccount(org.dom4j.Element element) {
+        Account account = new Account();
+
+        account.setId(element.elementText(ELEMENT_ACCOUNT_ID));
+        account.setName(element.elementText(ELEMENT_ACCOUNT_NAME));
+        account.setEmail(element.elementText(ELEMENT_ACCOUNT_EMAIL));
+        account.setPassword(element.elementText(ELEMENT_ACCOUNT_PASSWORD));
+        account.setActivated(("true".equals(element.elementText(ELEMENT_ACCOUNT_ACTIVATED)) ? true : false));
+
+        return account;
+    }
+
+    private org.dom4j.Element buildAccountElement(Account account) {
+        org.dom4j.Element element = DocumentHelper.createElement(ELEMENT_ACCOUNT);
+
+        element.addElement(ELEMENT_ACCOUNT_ID).setText(account.getId());
+        element.addElement(ELEMENT_ACCOUNT_NAME).setText(account.getName());
+        element.addElement(ELEMENT_ACCOUNT_EMAIL).setText(account.getEmail());
+        element.addElement(ELEMENT_ACCOUNT_PASSWORD).setText(account.getPassword());
+        element.addElement(ELEMENT_ACCOUNT_ACTIVATED).setText(account.isActivated() ? "true" : "false");
+
+        return element;
+    }
+
+    private org.dom4j.Document readDocument()
+            throws AccountPersistException {
+        File dataFile = new File(file);
+
+        if (!dataFile.exists()) {
+            dataFile.getParentFile().mkdirs();
+
+            org.dom4j.Element rootEle = DocumentHelper.createElement(ELEMENT_ROOT);
+            rootEle.addElement(ELEMENT_ACCOUNTS);
+            org.dom4j.Document doc = DocumentHelper.createDocument(rootEle);
+
+            writeDocument(doc);
+        }
+
+        try {
+            return reader.read(new File(file));
+        } catch (DocumentException e) {
+            throw new AccountPersistException("Unable to read persist data xml", e);
+        }
+    }
+
+    private void writeDocument(org.dom4j.Document doc)
+            throws AccountPersistException {
+        Writer out = null;
+
+        try {
+            out = new OutputStreamWriter(new FileOutputStream(file), "utf-8");
+
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            XMLWriter writer = new XMLWriter(out, format);
+            writer.write(doc);
+            writer.close();
+        } catch (IOException e) {
+            throw new AccountPersistException("Unable to write persist data xml", e);
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                throw new AccountPersistException("Unable to close persist data xml writer", e);
+            }
+        }
+    }
+}

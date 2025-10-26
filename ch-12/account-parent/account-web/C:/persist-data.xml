@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<account-persist> 
+  <accounts> 
+    <account> 
+      <id>David</id>  
+      <name>David Y S HUANG</name>  
+      <email>931655086@qq.com</email>  
+      <password>12345</password>  
+      <activated>false</activated> 
+    </account>  
+    <account>
+      <id>david</id>
+      <name>David</name>
+      <email>huangysd@gmail.com</email>
+      <password>Ndt$krr2</password>
+      <activated>false</activated>
+    </account>
+  </accounts> 
+</account-persist>
